@@ -1,0 +1,161 @@
+name: jobs-linux-no-test-run
+on: [pull_request]
+jobs:
+  build-linux-release:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: |-
+        make V=1 -j4 LIB_MODE=shared release
+        ls librocksdb.so
+        ./db_stress --version
+        make clean
+        make V=1 -j4 release
+        ls librocksdb.a
+        ./db_stress --version
+        make clean
+        apt-get remove -y libgflags-dev
+        make V=1 -j4 LIB_MODE=shared release
+        ls librocksdb.so
+        if ./db_stress --version; then false; else true; fi
+        make clean
+        make V=1 -j4 release
+        ls librocksdb.a
+        if ./db_stress --version; then false; else true; fi
+      shell: bash
+    - uses: "./.github/actions/post-steps"
+  build-linux-release-rtti:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: |-
+        USE_RTTI=1 DEBUG_LEVEL=0 make V=1 -j4 static_lib tools db_bench
+        ./db_stress --version
+        make clean
+        apt-get remove -y libgflags-dev
+        USE_RTTI=1 DEBUG_LEVEL=0 make V=1 -j4 static_lib tools db_bench
+        if ./db_stress --version; then false; else true; fi
+      shell: bash
+  build-examples:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build examples
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: make V=1 -j4 static_lib && cd examples && make V=1 -j4
+    - uses: "./.github/actions/post-steps"
+  build-fuzzers:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: CC=clang-13 CXX=clang++-13 USE_CLANG=1 make -j4 static_lib
+    - name: Build fuzzers
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: cd fuzz && make sst_file_writer_fuzzer db_fuzzer db_map_fuzzer
+    - uses: "./.github/actions/post-steps"
+  build-linux-clang-no_test_run:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: CC=clang CXX=clang++ USE_CLANG=1 PORTABLE=1 make V=1 -j4 all
+    - uses: "./.github/actions/post-steps"
+  build-linux-clang-13-no_test_run:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: CC=clang-13 CXX=clang++-13 USE_CLANG=1 make -j4 all microbench
+    - uses: "./.github/actions/post-steps"
+  build-linux-gcc-8-no_test_run:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: CC=gcc-8 CXX=g++-8 V=1 make -j4 all
+    - uses: "./.github/actions/post-steps"
+  build-linux-gcc-10-cxx20-no_test_run:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: CC=gcc-10 CXX=g++-10 V=1 ROCKSDB_CXX_STANDARD=c++20 make -j4 all
+    - uses: "./.github/actions/post-steps"
+  build-linux-gcc-11-no_test_run:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: LIB_MODE=static CC=gcc-11 CXX=g++-11 && mkdir build && cd build && cmake -DWITH_BENCHMARK=ON -DROCKSDB_PLUGINS=encfs .. && make V=1 -j4
+    - uses: "./.github/actions/post-steps"
+  build-linux-arm-cmake-no_test_run:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    env:
+      JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-arm64"
+    steps:
+    - run: echo "skip this job, Github Actions free plan does not support arm64 yet"
+#    - uses: actions/checkout@v4
+#    - uses: "./.github/actions/pre-steps"
+#    - uses: "./.github/actions/install-gflags"
+#    - name: Set Java Environment
+#      run: |-
+#        echo "JAVA_HOME=${JAVA_HOME}"
+#        echo 'export PATH=$JAVA_HOME/bin:$PATH' >> $GITHUB_ENV
+#        which java && java -version
+#        which javac && javac -version
+#    - name: Build with cmake
+#      working-directory: /__w/encfs/encfs/rocksdb
+#      run: |-
+#        mkdir build
+#        cd build
+#        cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=0 -DWITH_GFLAGS=1 -DWITH_BENCHMARK_TOOLS=0 -DWITH_TOOLS=0 -DWITH_CORE_TOOLS=1 -DROCKSDB_PLUGINS=encfs ..
+#        make -j4
+#    - name: Build Java with cmake
+#      working-directory: /__w/encfs/encfs/rocksdb
+#      run: |-
+#        rm -rf build
+#        mkdir build
+#        cd build
+#        cmake -DJNI=1 -DCMAKE_BUILD_TYPE=Release -DWITH_GFLAGS=1 -DROCKSDB_PLUGINS=encfs ..
+#        make -j4 rocksdb rocksdbjni
+#    - uses: "./.github/actions/post-steps"

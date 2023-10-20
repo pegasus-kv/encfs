@@ -1,0 +1,8 @@
+name: build-folly
+runs:
+  using: composite
+  steps:
+  - name: Build folly and dependencies
+    working-directory: /__w/encfs/encfs/rocksdb
+    run: make build_folly -j4
+    shell: bash

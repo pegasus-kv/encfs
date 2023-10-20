@@ -1,0 +1,25 @@
+name: post-steps
+runs:
+  using: composite
+  steps:
+  - uses: actions/upload-artifact@v3.1.1
+    with:
+      path: "/tmp/test-results"
+  - uses: actions/upload-artifact@v3.1.1
+    with:
+      path: LOG
+  - name: Compress Test Logs
+    run: tar -cvzf t.tar.gz t
+    if: failure()
+    shell: bash
+  - uses: actions/upload-artifact@v3.1.1
+    with:
+      path: t.tar.gz
+  - run: |-
+      mkdir -p /tmp/core_dumps
+      cp core.* /tmp/core_dumps
+    if: failure()
+    shell: bash
+  - uses: actions/upload-artifact@v3.1.1
+    with:
+      path: "/tmp/core_dumps"

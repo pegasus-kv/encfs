@@ -1,0 +1,17 @@
+name: build-fuzzers
+on: [pull_request]
+jobs:
+  build-fuzzers:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build rocksdb
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: CC=clang-13 CXX=clang++-13 USE_CLANG=1 make -j4 static_lib
+    - name: Build fuzzers
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: cd fuzz && make sst_file_writer_fuzzer db_fuzzer db_map_fuzzer
+    - uses: "./.github/actions/post-steps"

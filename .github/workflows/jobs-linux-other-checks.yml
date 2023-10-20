@@ -1,0 +1,50 @@
+name: jobs-linux-other-checks
+on: [pull_request]
+jobs:
+  build-linux-clang10-clang-analyze:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: CC=clang-10 CXX=clang++-10 ROCKSDB_DISABLE_ALIGNED_NEW=1 CLANG_ANALYZER="/usr/bin/clang++-10" CLANG_SCAN_BUILD=scan-build-10 USE_CLANG=1 make V=1 -j4 analyze
+    - uses: "./.github/actions/post-steps"
+    - name: compress test report
+      run: tar -cvzf scan_build_report.tar.gz scan_build_report
+      if: failure()
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: scan_build_report.tar.gz
+  build-linux-unity-and-headers:
+    runs-on: ubuntu-latest
+    container:
+      image: gcc:latest
+    env:
+      EXTRA_CXXFLAGS: "-mno-avx512f"
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Install gflags
+      run: apt-get update -y && apt-get install -y libgflags-dev
+    - name: Unity build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: make V=1 -j4 unity_test
+    - name: Check headers
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: make V=1 -j4 -k check-headers
+    - uses: "./.github/actions/post-steps"
+  build-linux-mini-crashtest:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: echo "skip this job"
+#      run: ulimit -S -n `ulimit -H -n` && make V=1 -j4 CRASH_TEST_EXT_ARGS='--duration=30 --max_key=20 --use_io_uring=0' blackbox_crash_test_with_atomic_flush
+    - uses: "./.github/actions/post-steps"

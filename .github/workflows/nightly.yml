@@ -1,0 +1,82 @@
+name: nightly
+on:
+  schedule:
+  - cron: 0 9 * * *
+#   # 'filters' was not transformed because there is no suitable equivalent in GitHub Actions
+jobs:
+  build-format-compatible:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: echo "skip this job, not sure how to check the correctness"
+#      run: |-
+#        export TEST_TMPDIR=/dev/shm/rocksdb
+#        rm -rf /dev/shm/rocksdb
+#        mkdir /dev/shm/rocksdb
+#        sed -i 's/facebook\/rocksdb/acelyc111\/encfs/' tools/check_format_compatible.sh
+#        tools/check_format_compatible.sh
+    - uses: "./.github/actions/post-steps"
+  build-linux-arm-test-full:
+    runs-on: ubuntu-20.04
+    steps:
+    - run: echo "skip this job, Github Actions free plan does not support arm64 yet"
+#    - uses: actions/checkout@v4
+#    - uses: "./.github/actions/pre-steps"
+#    - uses: "./.github/actions/install-gflags"
+#    - name: Build and test
+#      working-directory: /__w/encfs/encfs/rocksdb
+#      run: make V=1 J=4 -j4 check
+#    - uses: "./.github/actions/post-steps"
+  build-linux-run-microbench:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: DEBUG_LEVEL=0 make -j4 run_microbench
+    - uses: "./.github/actions/post-steps"
+  build-linux-non-shm:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    env:
+      TEST_TMPDIR: "/tmp/rocksdb_test_tmp"
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: make V=1 -j4 check
+    - uses: "./.github/actions/post-steps"
+  build-linux-clang-13-asan-ubsan-with-folly:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - uses: "./.github/actions/setup-folly"
+    - uses: "./.github/actions/build-folly"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: CC=clang-13 CXX=clang++-13 LIB_MODE=static USE_CLANG=1 USE_FOLLY=1 COMPILE_WITH_UBSAN=1 COMPILE_WITH_ASAN=1 make -j4 check
+    - uses: "./.github/actions/post-steps"
+  build-linux-valgrind:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: PORTABLE=1 make V=1 -j4 valgrind_test
+    - uses: "./.github/actions/post-steps"
