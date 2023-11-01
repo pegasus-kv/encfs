@@ -116,3 +116,6 @@ $ g++ -std=c++17 -o test test.cpp -lrocksdb -lpthread -llz4 -lcrypto -u encfs_re
 $ ./tmp
 ```
 
+# Thanks
+
+Some of the implementations are inspired by [Apache Kudu](https://github.com/apache/kudu) and [tikv/rocksdb](https://github.com/tikv/rocksdb)
