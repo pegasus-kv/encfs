@@ -18,7 +18,7 @@ jobs:
 #        export TEST_TMPDIR=/dev/shm/rocksdb
 #        rm -rf /dev/shm/rocksdb
 #        mkdir /dev/shm/rocksdb
-#        sed -i 's/facebook\/rocksdb/acelyc111\/encfs/' tools/check_format_compatible.sh
+#        sed -i 's/facebook\/rocksdb/pegasus-kv\/encfs/' tools/check_format_compatible.sh
 #        tools/check_format_compatible.sh
     - uses: "./.github/actions/post-steps"
   build-linux-arm-test-full:

@@ -8,7 +8,7 @@ The code first needs to be linked under RocksDB's "plugin/" directory. In your R
 
 ```
 $ pushd ./plugin/
-$ git clone https://github.com/acelyc111/encfs.git
+$ git clone https://github.com/pegasus-kv/encfs.git
 ```
 
 Next, we can build and install RocksDB with this plugin as follows:
