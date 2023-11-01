@@ -80,3 +80,4 @@ jobs:
       working-directory: /__w/encfs/encfs/rocksdb
       run: PORTABLE=1 make V=1 -j4 valgrind_test
     - uses: "./.github/actions/post-steps"
+ 
