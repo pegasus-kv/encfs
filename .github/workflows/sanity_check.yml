@@ -1,5 +1,9 @@
 name: Check buck targets and code format
-on: [pull_request]
+on:
+  pull_request:
+    types: [ synchronize, opened, reopened ]
+    branches:
+      - main
 permissions:
   contents: read
 

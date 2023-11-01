@@ -1,5 +1,9 @@
 name: jobs-macos
-on: [pull_request]
+on:
+  pull_request:
+    types: [ synchronize, opened, reopened ]
+    branches:
+      - main
 jobs:
   build-macos:
     runs-on: macos-11

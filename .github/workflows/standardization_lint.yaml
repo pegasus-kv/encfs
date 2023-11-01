@@ -16,7 +16,11 @@
 # under the License.
 ---
 name: Standardization Lint
-on: [pull_request]
+on:
+  pull_request:
+    types: [ synchronize, opened, reopened ]
+    branches:
+      - main
 jobs:
   license_check:
     name: Check License
