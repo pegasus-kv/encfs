@@ -16,7 +16,6 @@
 // under the License.
 
 #pragma once
-#include <gtest/gtest.h>
 #include <openssl/evp.h>
 
 #include <string>
@@ -160,10 +159,10 @@ class AESEncryptionProvider : public EncryptionProvider {
       std::unique_ptr<BlockAccessCipherStream>* result) override;
 
  private:
-  FRIEND_TEST(AESEncryptionProviderDeterministicTest, DecryptFileKey);
-  FRIEND_TEST(AESEncryptionProviderDeterministicTest, EncryptFileKey);
-  FRIEND_TEST(AESEncryptionProviderTest, EncryptAndDecryptFileKey);
-  FRIEND_TEST(AESEncryptionProviderTest, WriteAndReadEncryptionHeader);
+  friend class AESEncryptionProviderDeterministicTest_DecryptFileKey_Test;
+  friend class AESEncryptionProviderDeterministicTest_EncryptFileKey_Test;
+  friend class AESEncryptionProviderTest_EncryptAndDecryptFileKey_Test;
+  friend class AESEncryptionProviderTest_WriteAndReadEncryptionHeader_Test;
 
   struct FileEncryptionInfo {
     EncryptionMethod method = EncryptionMethod::kUnknown;
