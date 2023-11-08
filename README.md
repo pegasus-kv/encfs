@@ -29,7 +29,7 @@ set -ex
 # 1. build
 mkdir build && cd build
 cmake -DWITH_LZ4=1 -DCMAKE_BUILD_TYPE=Debug -DWITH_TESTS=1 -DROCKSDB_BUILD_SHARED=0 -DROCKSDB_PLUGINS=encfs ..
-make -j32
+make -j $(nproc)
 
 # 2. run encfs_test
 ./encfs_test
