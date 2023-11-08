@@ -1,0 +1,69 @@
+name: jobs-linux-run-tests-san
+on:
+  pull_request:
+    types: [ synchronize, opened, reopened ]
+    branches:
+      - main
+jobs:
+  build-linux-clang10-asan:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: |-
+        mkdir build && cd build && cmake -DWITH_ASAN=ON -DROCKSDB_PLUGINS=encfs .. && make V=1 -j5 encfs_test env_basic_test env_test
+        TEST_FS_URI="provider={method=AES256CTR;id=AES;hex_instance_key=0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF};id=EncryptedFileSystem"
+        ./encfs_test
+        ./env_basic_test --gtest_filter=*CustomEnv*
+        ./env_test --gtest_filter=CreateEnvTest.CreateEncryptedFileSystem
+      shell: bash
+    - uses: "./.github/actions/post-steps"
+  build-linux-clang10-ubsan:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    env:
+      CC: clang-13
+      CXX: clang++-13
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: |-
+        mkdir build && cd build && cmake -DWITH_UBSAN=ON -DROCKSDB_PLUGINS=encfs .. && make V=1 -j5 encfs_test env_basic_test env_test
+        TEST_FS_URI="provider={method=AES256CTR;id=AES;hex_instance_key=0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF};id=EncryptedFileSystem"
+        ./encfs_test
+        ./env_basic_test --gtest_filter=*CustomEnv*
+        ./env_test --gtest_filter=CreateEnvTest.CreateEncryptedFileSystem
+      shell: bash
+    - uses: "./.github/actions/post-steps"
+  build-linux-clang10-mini-tsan:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: mkdir build && cd build && cmake -DWITH_TSAN=ON -DROCKSDB_PLUGINS=encfs .. && make V=1 -j5 && ./env_basic_test && ./io_posix_test && ./mock_env_test && ./encfs_test
+    - uses: "./.github/actions/post-steps"
+  build-linux-static_lib-alt_namespace-status_checked:
+    runs-on: ubuntu-latest
+    container:
+      image: zjay437/rocksdb:0.6
+    env:
+      CC: clang-13
+      CXX: clang++-13
+    steps:
+    - uses: actions/checkout@v4
+    - uses: "./.github/actions/pre-steps"
+    - name: Build and test
+      working-directory: /__w/encfs/encfs/rocksdb
+      run: mkdir build && cd build && cmake -DASSERT_STATUS_CHECKED=ON -DROCKSDB_BUILD_SHARED=OFF -DROCKSDB_NAMESPACE=alternative_rocksdb_ns -DMODIFY_NPHASH=1 -DTEST_UINT128_COMPAT=1 -DROCKSDB_PLUGINS=encfs .. && make V=1 -j5 encfs_test && ./encfs_test
+    - uses: "./.github/actions/post-steps"

@@ -1,0 +1,7 @@
+name: install-jdk8-on-macos
+runs:
+  using: composite
+  steps:
+  - name: Install JDK 8 on macos
+    run: brew install --cask adoptopenjdk/openjdk/adoptopenjdk8
+    shell: bash

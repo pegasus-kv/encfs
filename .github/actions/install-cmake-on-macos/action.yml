@@ -1,0 +1,7 @@
+name: install-cmake-on-macos
+runs:
+  using: composite
+  steps:
+  - name: Install cmake on macos
+    run: HOMEBREW_NO_AUTO_UPDATE=1 brew install cmake
+    shell: bash
