@@ -115,7 +115,7 @@ int main() {
 }
 EOF
 $ g++ -std=c++17 -o test test.cpp -lrocksdb -lpthread -llz4 -lcrypto -u encfs_reg
-$ ./tmp
+$ ./test
 ```
 
 # Thanks
