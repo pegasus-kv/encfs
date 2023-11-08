@@ -5,8 +5,11 @@ The `AESEncryptionProvider` of `EncryptionFileSystem` is an encryption plugin fo
 ## Build
 Download the RocksDB code from the official repository. Currently, version 8.5.3 is used as the benchmark for testing.
 
+```
 git clone --depth 1 --branch v8.5.3 https://github.com/facebook/rocksdb.git
-The code first needs to be linked under RocksDB's "plugin/" directory. In your RocksDB directory, run:
+```
+
+The code first needs to be linked under RocksDB's `plugin/` directory. In your RocksDB directory, run:
 
 ```
 $ pushd ./plugin/
