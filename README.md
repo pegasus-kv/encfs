@@ -43,7 +43,7 @@ for opt in ${opts[*]}; do
   # 3.1. Run all tests
   # Set env ENCRYPTED_ENV and run all tests
   export ENCRYPTED_ENV=${opt}
-  ctest -j32 -V
+  ctest -j $(nproc) -V
   unset ENCRYPTED_ENV
 
   uri='provider={${uri}};id=EncryptedFileSystem'
