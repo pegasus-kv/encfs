@@ -3,10 +3,10 @@
 The `AESEncryptionProvider` of `EncryptionFileSystem` is an encryption plugin for RocksDB. It depends on OpenSSL to show how an external plugin can bring its dependencies into the RocksDB build. It provides a factory function in a header file to show integration with RocksDB header includes. It can also be enabled in text-based options to demonstrate use of the static registration framework.
 
 ## Build
-Download the RocksDB code from the official repository. Currently, version 8.5.3 is used as the benchmark for testing.
+Download the RocksDB code from the official repository.
 
 ```
-git clone --depth 1 --branch v8.5.3 https://github.com/facebook/rocksdb.git
+git clone --depth 1 https://github.com/facebook/rocksdb.git
 ```
 
 The code first needs to be linked under RocksDB's `plugin/` directory. In your RocksDB directory, run:
